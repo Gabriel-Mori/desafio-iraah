@@ -6,7 +6,6 @@ import ClientForm from "../../../components/ProfileData/form-client";
 import http from "../../../http";
 
 const Edit: NextPage = ({ client }: any) => {
-  console.log("client", client);
   const router = useRouter();
 
   return (
@@ -31,7 +30,7 @@ const Edit: NextPage = ({ client }: any) => {
           </div>
         </div>
 
-        <ClientForm />
+        <ClientForm initialData={client} />
       </div>
     </Base>
   );

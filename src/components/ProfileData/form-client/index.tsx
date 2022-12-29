@@ -1,16 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ClientService } from "../../../services/client-service";
 import Input from "../../input";
+import { useRouter } from "next/router";
+import { useAlert } from "react-alert";
+import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
+import http from "../../../http";
 
-const ClientForm: React.FC = () => {
-  const [client, setclient] = useState<any>({});
+interface Props {
+  initialData?: any;
+}
+
+const ClientForm: React.FC<Props> = ({ initialData }: any) => {
+  const [client, setclient] = useState<any>(initialData || {});
+  const router = useRouter();
 
   const handleSubmitChange = async () => {
-    await ClientService.ClientForm({
-      name: client.name,
-      companyName: client.companyName,
-      email: client.email,
-    });
+    await toast.promise(
+      ClientService.ClientForm({
+        name: client.name,
+        companyName: client.companyName,
+        email: client.email,
+      }),
+      {
+        pending: "Verificando dados",
+        success: "Salvo com sucesso 👌",
+        error: "Erro ao salvar 🤯",
+      }
+    );
+    setTimeout(() => {
+      router.push("/clients/list");
+    }, 1000);
   };
 
   const handleInputValue = (e: any, name: string) => {
@@ -45,7 +65,10 @@ const ClientForm: React.FC = () => {
       </form>
       <div className="flex justify-center mt-16">
         <button
-          className="w-96 bg-[#0cbcbe] outline-none text-white font-bold py-4 border-none rounded-full"
+          disabled={!client.name}
+          className={`w-96  ${
+            client.name ? " bg-[#0cbcbe] hover:bg-[#53aeb0]" : "bg-[#507879]"
+          } outline-none transition ease-in-out delay-100 text-white font-bold py-4 border-none rounded-full`}
           type="button"
           onClick={handleSubmitChange}
         >

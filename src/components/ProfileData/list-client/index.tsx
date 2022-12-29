@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { ClientService } from "../../../services/client-service";
-import Label from "../../Label";
 import List from "../../List";
 import ListColumn from "../../List/ListColumn";
 import { FiEdit } from "react-icons/fi";
@@ -8,28 +7,28 @@ import { HiTrash } from "react-icons/hi2";
 import { useRouter } from "next/router";
 import http from "../../../http";
 
-const ClientList: React.FC = () => {
-  const [response, setResponse] = useState([]);
-  const [customer, setCustomer] = useState([]);
+interface Props {
+  clientFiltered?: any;
+}
+
+const ClientList: React.FC = ({ clientFiltered }: any) => {
+  const [response, setResponse] = useState(clientFiltered || []);
+
   const router = useRouter();
 
-  const getBestClients = () => {
-    ClientService.getClient().then((res) => setResponse(res.data));
+  const searchClients = () => {
+    ClientService.getClient().then((response) =>
+      setResponse(response.data.content)
+    );
   };
 
   const deleteClientFromList = async (id: any) => {
-    await http.delete(`/clients/list/${id}`);
-    const userDelete = customer.filter((user) => {
-      console.log(user);
-      return user !== id;
-    });
-
-    setCustomer(userDelete);
-    console.log(id);
+    await http.delete(`/client/${id}`);
+    searchClients();
   };
 
   useEffect(() => {
-    getBestClients();
+    searchClients();
   }, []);
 
   const edit = (id: any) => {
@@ -37,20 +36,20 @@ const ClientList: React.FC = () => {
   };
 
   return (
-    <>
+    <div>
       {response && (
-        <div className="max-w-max flex  ml-3 mr-3">
-          <div className="p-4">
+        <div className="shadow-2xl border rounded">
+          <div className="p-2 ">
             <List data={response ? response : []} minWidth={1000}>
-              <ListColumn name="name" label="Nome" />
-              <ListColumn name="companyName" label="Empresa" />
-              <ListColumn name="email" label="Email" />
+              <ListColumn name="name" label="Nome" align="center" />
+              <ListColumn name="companyName" label="Empresa" align="center" />
+              <ListColumn name="email" label="Email" align="center" />
               <ListColumn
                 name="edit"
                 label="Editar"
                 render={(row) => (
-                  <div className="flex items-center justify-center w-8 h-8 ml-32 text-gray-500 ">
-                    <label className="cursor-pointer">
+                  <div className="flex  justify-end  text-gray-500 ">
+                    <label className="cursor-pointer mr-1">
                       <FiEdit
                         size={22}
                         onClick={() => {
@@ -66,8 +65,8 @@ const ClientList: React.FC = () => {
                 name="delete"
                 label="Deletar"
                 render={(row) => (
-                  <div className="w-8 h-8 ml-32 text-gray-500 flex items-center justify-center ">
-                    <label className="cursor-pointer">
+                  <div className="flex  justify-end  text-gray-500">
+                    <label className="cursor-pointer mr-2">
                       <HiTrash
                         size={22}
                         style={{ color: "#ff0000" }}
@@ -84,7 +83,7 @@ const ClientList: React.FC = () => {
           </div>
         </div>
       )}
-    </>
+    </div>
   );
 };
 

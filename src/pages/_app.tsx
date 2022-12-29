@@ -1,8 +1,8 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-import UserContext from "../contexts/UserContext";
 import { ThemeProvider } from "../contexts/ThemeContext";
-import { parseCookies } from "nookies";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface Props extends AppProps {
   defaultTheme: "light" | "dark";
@@ -22,9 +22,8 @@ export default function App({
 }: Props) {
   return (
     <ThemeProvider defaultTheme={defaultTheme}>
-      <UserContext user={user}>
-        <Component {...pageProps} />
-      </UserContext>
+      <Component {...pageProps} />
+      <ToastContainer autoClose={2000} />
     </ThemeProvider>
   );
 }
