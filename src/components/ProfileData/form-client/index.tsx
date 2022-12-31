@@ -12,7 +12,7 @@ interface Props {
 }
 
 const ClientForm: React.FC<Props> = ({ initialData }: any) => {
-  const [client, setclient] = useState<any>(initialData || {});
+  const [client, setClient] = useState<any>(initialData || {});
   const router = useRouter();
 
   const handleSubmitChange = async () => {
@@ -34,7 +34,7 @@ const ClientForm: React.FC<Props> = ({ initialData }: any) => {
   };
 
   const handleInputValue = (e: any, name: string) => {
-    setclient({ ...client, [name]: e.target.value });
+    setClient({ ...client, [name]: e.target.value });
   };
 
   return (

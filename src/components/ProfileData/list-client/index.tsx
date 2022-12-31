@@ -7,13 +7,8 @@ import { HiTrash } from "react-icons/hi2";
 import { useRouter } from "next/router";
 import http from "../../../http";
 
-interface Props {
-  clientFiltered?: any;
-}
-
-const ClientList: React.FC = ({ clientFiltered }: any) => {
-  const [response, setResponse] = useState(clientFiltered || []);
-
+const ClientList: React.FC = () => {
+  const [response, setResponse] = useState([]);
   const router = useRouter();
 
   const searchClients = () => {

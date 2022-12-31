@@ -4,8 +4,9 @@ import { useRouter } from "next/router";
 import { RiArrowGoBackLine } from "react-icons/ri";
 import ClientForm from "../../../components/ProfileData/form-client";
 import http from "../../../http";
+import FormProject from "../../../components/Project/project-form";
 
-const Edit: NextPage = ({ client }: any) => {
+const Edit: NextPage = ({ projects }: any) => {
   const router = useRouter();
 
   return (
@@ -30,7 +31,7 @@ const Edit: NextPage = ({ client }: any) => {
           </div>
         </div>
 
-        <ClientForm />
+        <FormProject initialData={projects} />
       </div>
     </Base>
   );
@@ -39,13 +40,13 @@ const Edit: NextPage = ({ client }: any) => {
 export default Edit;
 
 export const getServerSideProps = async (context: any) => {
-  const client = await http
-    .get(`/client/${context.params.id}`)
+  const projectsEdit = await http
+    .get(`/project/${context.params.id}`)
     .then((resp) => resp.data);
 
   return {
     props: {
-      client: client,
+      projects: projectsEdit,
     },
   };
 };

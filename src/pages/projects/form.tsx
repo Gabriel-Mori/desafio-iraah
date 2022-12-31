@@ -3,6 +3,7 @@ import Base from "../../components/Base";
 import { useRouter } from "next/router";
 import { RiArrowGoBackLine } from "react-icons/ri";
 import ClientForm from "../../components/ProfileData/form-client";
+import FormProject from "../../components/Project/project-form";
 
 const Form: NextPage = ({ client }: any) => {
   const router = useRouter();
@@ -18,7 +19,7 @@ const Form: NextPage = ({ client }: any) => {
             <button
               className={` text-gray-700 dark:text-white rounded-full px-6 py-1 ml-3`}
               onClick={() => {
-                router.push("/clients/list");
+                router.push("/projects/list");
               }}
             >
               <div className="flex items-center mt-3 ">
@@ -29,7 +30,7 @@ const Form: NextPage = ({ client }: any) => {
           </div>
         </div>
 
-        <ClientForm />
+        <FormProject />
       </div>
     </Base>
   );

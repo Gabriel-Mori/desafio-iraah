@@ -6,7 +6,7 @@ import { HiPlus } from "react-icons/hi2";
 import ClientList from "../../components/ProfileData/list-client";
 import http from "../../http";
 
-const ListPage: NextPage = ({ list }: any) => {
+const ListPage: NextPage = () => {
   const [clientFiltered, setClientFiltered] = useState([]);
 
   const router = useRouter();

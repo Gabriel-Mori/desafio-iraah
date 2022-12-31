@@ -6,6 +6,7 @@ import { HiTrash } from "react-icons/hi2";
 import { useRouter } from "next/router";
 import { ProjectService } from "../../../services/project-service";
 import { Tooltip } from "@mui/material";
+import http from "../../../http";
 
 const ProjectsList: React.FC = () => {
   const [listProjects, setListProjects] = useState([]);
@@ -19,9 +20,14 @@ const ProjectsList: React.FC = () => {
     getListProjects();
   }, []);
 
-  // const edit = (id: any) => {
-  //   router.push(`/clients/edit/${id}`);
-  // };
+  const deleteProjectFromList = async (id: any) => {
+    await http.delete(`/project/${id}`);
+    getListProjects();
+  };
+
+  const edit = (id: any) => {
+    router.push(`/projects/edit/${id}`);
+  };
 
   console.log("listProjects", listProjects);
   return (
@@ -36,17 +42,7 @@ const ProjectsList: React.FC = () => {
                 label="Cliente"
                 render={(row) => (
                   <div className="flex items-center justify-center w-8 h-8 ml-20 text-gray-500 ">
-                    <Tooltip
-                      title={row.client?.name}
-                      placement="bottom"
-                      arrow
-                      enterDelay={400}
-                      leaveDelay={400}
-                    >
-                      <label className="">
-                        <label>{row.client?.name}</label>
-                      </label>
-                    </Tooltip>
+                    <label className="text-gray-900">{row.client?.name}</label>
                   </div>
                 )}
                 align="center"
@@ -58,7 +54,17 @@ const ProjectsList: React.FC = () => {
                   <div className="flex items-center justify-center w-8 h-8 ml-20 text-gray-500 ">
                     <Tooltip
                       style={{ color: "#9E9E9E" }}
-                      title={row.employee[0]?.name}
+                      title={
+                        <div>
+                          {row.employee.map((item: any, i: any) => {
+                            return (
+                              <span key={i}>
+                                {item.name} <br />
+                              </span>
+                            );
+                          })}
+                        </div>
+                      }
                       placement="bottom"
                       arrow
                       enterDelay={400}
@@ -82,22 +88,14 @@ const ProjectsList: React.FC = () => {
                 label="Editar"
                 render={(row) => (
                   <div className="flex items-center justify-center w-8 h-8 ml-20 text-gray-500 ">
-                    <Tooltip
-                      title="Editar"
-                      placement="bottom"
-                      arrow
-                      enterDelay={400}
-                      leaveDelay={400}
-                    >
-                      <label className="cursor-pointer">
-                        <FiEdit
-                          size={22}
-                          onClick={() => {
-                            // edit(row.id);
-                          }}
-                        />
-                      </label>
-                    </Tooltip>
+                    <label className="cursor-pointer">
+                      <FiEdit
+                        size={22}
+                        onClick={() => {
+                          edit(row.id);
+                        }}
+                      />
+                    </label>
                   </div>
                 )}
                 align="center"
@@ -108,7 +106,13 @@ const ProjectsList: React.FC = () => {
                 render={(row) => (
                   <div className="w-8 h-8 ml-20 text-gray-500 flex items-center justify-center ">
                     <label className="cursor-pointer">
-                      <HiTrash size={22} style={{ color: "#ff0000" }} />
+                      <HiTrash
+                        size={22}
+                        onClick={() => {
+                          deleteProjectFromList(row.id);
+                        }}
+                        style={{ color: "#ff0000" }}
+                      />
                     </label>
                   </div>
                 )}

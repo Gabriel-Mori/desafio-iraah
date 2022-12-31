@@ -122,8 +122,8 @@ const List: React.FC<Props> = ({
         )}
         {data.length === 0 && !loading && (
           <div className="flex h-64 flex-col items-center justify-center">
-            <FiSearch size={100} className="text-gray-300 ml-96" />
-            <span className="ml-96 text-xl font-semibold text-gray-400 mt-4">
+            <FiSearch size={100} className="text-gray-300 " />
+            <span className=" text-xl font-semibold text-gray-400 mt-4">
               Nenhum dado encontrado
             </span>
           </div>

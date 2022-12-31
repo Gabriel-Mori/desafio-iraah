@@ -5,9 +5,9 @@ export namespace ProjectService {
     return http.get("/project")
   }
 
-  // export async function ClientForm(props: any) {
-  //   return http.post("/client", props)
-  // }
+  export async function formProjectSubmit(props: any) {
+    return http.post("/project", props)
+  }
 
 
 }
