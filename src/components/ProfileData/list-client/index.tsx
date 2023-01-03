@@ -12,11 +12,8 @@ const ClientList: React.FC = () => {
   const router = useRouter();
 
   const searchClients = () => {
-    ClientService.getClient().then((response) =>
-      setResponse(response.data.content)
-    );
+    ClientService.getClient().then((response) => setResponse(response.data));
   };
-
   const deleteClientFromList = async (id: any) => {
     await http.delete(`/client/${id}`);
     searchClients();

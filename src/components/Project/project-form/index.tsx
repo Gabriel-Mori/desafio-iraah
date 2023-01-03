@@ -6,7 +6,6 @@ import Label from "../../Label";
 import { useRouter } from "next/router";
 import http from "../../../http";
 import moment from "moment";
-import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import KgDatePicker from "../../KgDatePicker";
 
@@ -16,12 +15,14 @@ interface Props {
 
 const FormProject: React.FC<Props> = ({ initialData }: any) => {
   const [project, setProject] = useState<any>(initialData || {});
-  const router = useRouter();
+  const [client, setClient] = useState<any>("");
+  const [search, setSearch] = useState<any>([]);
 
+  const router = useRouter();
   const submitForm = async () => {
     await ProjectService.formProjectSubmit({
       startDate: Number(moment(project?.startDate)),
-      endDate: Number(moment(project?.startDate)),
+      endDate: Number(moment(project?.endDate)),
       client: project.client,
       projectName: project.projectName,
       employee: project.employee,
@@ -33,22 +34,20 @@ const FormProject: React.FC<Props> = ({ initialData }: any) => {
 
   const getClientSelect = () => {
     http.get("/client").then((resp) => {
-      const response = resp.data.content;
-      const client = response.client;
-
-      return client;
+      const data = resp.data;
+      setSearch(data);
     });
   };
-
+  console.log(client);
   useEffect(() => {
     getClientSelect();
   }, []);
 
+  console.log("searchClient", search);
+
   const handleInputValue = (e: any, name: string) => {
     setProject({ ...project, [name]: e.target.value });
   };
-
-  console.log("projecta", project);
 
   return (
     <>
@@ -63,12 +62,19 @@ const FormProject: React.FC<Props> = ({ initialData }: any) => {
         <div className="w-full mr-4 ">
           <Label label="Cliente" />
           <Select
-            isClearable={false}
             placeholder="Selecione o Cliente"
-            onChange={(_, e) => handleInputValue(e, "Cliente")}
-            value={project.client}
-            fetch={getClientSelect}
-            fieldLabel={"name"}
+            onChange={(_, value) => {
+              const data = { ...search, client: value };
+              setSearch(data);
+
+              // if (value) {
+              //   handleInputValue(value, "cliente");
+              // }
+            }}
+            fetch={search}
+            value={search.map((item: any) => item.name)}
+            fieldLabel="name"
+            // isMulti={true}
           />
         </div>
         <div className="w-full mr-4  mt-4">
@@ -89,7 +95,6 @@ const FormProject: React.FC<Props> = ({ initialData }: any) => {
           <div className=" flex items-center">
             <label className="mr-2 text-gray-700 dark:text-white">De:</label>
             <KgDatePicker
-              className=" rounded-md h-15 p-2 outline-none"
               onChange={(e: any, value: any) => {
                 const objFilter = {
                   ...project,
@@ -105,7 +110,6 @@ const FormProject: React.FC<Props> = ({ initialData }: any) => {
               Até:
             </label>
             <KgDatePicker
-              className="rounded-md h-15 p-2 outline-none"
               onChange={(e: any, value: any) => {
                 const objFilter = {
                   ...project,

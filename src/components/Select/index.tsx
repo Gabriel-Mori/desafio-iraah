@@ -30,6 +30,7 @@ interface Props {
   enableAdd?: boolean;
   defaultLabelCreate?: string;
   theme?: string;
+  isMulti?: Boolean;
 }
 
 const Select: React.FC<Props> = ({
@@ -53,6 +54,7 @@ const Select: React.FC<Props> = ({
   onCreate,
   enableAdd = false,
   defaultLabelCreate,
+  isMulti,
   theme = "light",
 }) => {
   const inputRef = useRef(null);
