@@ -7,32 +7,45 @@ import { useRouter } from "next/router";
 import http from "../../../http";
 import { OrganizationService } from "../../../services/organizations-service";
 
-const ClientList: React.FC = () => {
-  const [response, setResponse] = useState([]);
+const CompanyList: React.FC = () => {
+  const [company, setCompany] = useState([]);
   const router = useRouter();
 
-  const searchClients = (searchTerm: any = "") => {
-    OrganizationService.getClient(searchTerm).then((response) =>
-      setResponse(response.data)
+  const searchCompany = (searchTerm: any = "") => {
+    OrganizationService.getCompany(searchTerm).then((response) =>
+      setCompany(response.data)
     );
   };
 
   const handleInputSearch = (e: any) => {
     const { value } = e.target;
-    searchClients(value);
+    searchCompany(value);
   };
 
-  const deleteClientFromList = async (id: any) => {
-    await http.delete(`/customer/${id}`);
-    searchClients();
+  const deleteCompany = async (id: any) => {
+    await http.delete(`/company/${id}`);
+    searchCompany();
+  };
+
+  const handlePhone = (event: any) => {
+    let input = event.target;
+    input.value = phoneMask(input.value);
+  };
+
+  const phoneMask = (value: any) => {
+    value = value.replace(/\D/g, "");
+    value = value.replace(/(\d{2})(\d)/, "($1) $2");
+    value = value.replace(/(\d)(\d{4})$/, "$1-$2");
+
+    return value;
   };
 
   useEffect(() => {
-    searchClients();
+    searchCompany();
   }, []);
 
   const edit = (id: any) => {
-    router.push(`/clients/edit/${id}`);
+    router.push(`/company/edit/${id}`);
   };
 
   return (
@@ -51,7 +64,7 @@ const ClientList: React.FC = () => {
           <button
             className={` text-white dark:text-white text-1xl rounded-full px-6 py-2 w-60 h-14 ml-5 mt-8 hover:bg-orange-500 bg-orange-400`}
             onClick={() => {
-              router.push("/clients/form");
+              router.push("/company/form");
             }}
           >
             <div className="flex items-center ">
@@ -61,42 +74,58 @@ const ClientList: React.FC = () => {
           </button>
         </div>
       </div>
-
-      {response && (
+      {company && (
         <div className="shadow-2xl border bg-slate-100 rounded">
           <div className="p-2 ">
-            <List data={response ? response : []} minWidth={1000}>
+            <List data={company ? company : []} minWidth={1000}>
               <ListColumn
                 name="name"
                 label="Nome"
                 render={(row) => (
                   <div>
                     <label className="text-gray-900">
-                      {row.name ? row.name : "----"}
+                      {row.companyName ? row.companyName : "----"}
                     </label>
                   </div>
                 )}
                 align="center"
               />
               <ListColumn
-                name="company"
-                label="Empresa"
+                name="city"
+                label="Ciadade"
                 render={(row) => (
                   <div>
                     <label className="text-gray-900">
-                      {row.company ? row.company.companyName : "----"}
+                      {row.city ? row.city : "----"}
                     </label>
                   </div>
                 )}
                 align="center"
               />
               <ListColumn
-                name="email"
-                label="Email"
+                name="cellphone"
+                label="Telefone"
                 render={(row) => (
                   <div>
                     <label className="text-gray-900">
-                      {row.email ? row.email : "----"}
+                      {row.cellphone ? row.cellphone : "----"}
+                    </label>
+                  </div>
+                )}
+                align="center"
+              />
+              <ListColumn
+                name="cnpj"
+                label="CNPJ"
+                render={(row) => (
+                  <div>
+                    <label className="text-gray-900">
+                      {row.cnpj
+                        ? row.cnpj.replace(
+                            /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
+                            "$1.$2.$3/$4-$5"
+                          )
+                        : "----"}
                     </label>
                   </div>
                 )}
@@ -129,7 +158,7 @@ const ClientList: React.FC = () => {
                         size={22}
                         style={{ color: "#ff0000" }}
                         onClick={() => {
-                          deleteClientFromList(row.id);
+                          deleteCompany(row.id);
                         }}
                       />
                     </label>
@@ -145,4 +174,4 @@ const ClientList: React.FC = () => {
   );
 };
 
-export default ClientList;
+export default CompanyList;

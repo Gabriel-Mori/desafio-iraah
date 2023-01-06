@@ -117,7 +117,7 @@ const Select: React.FC<Props> = ({
           })
         );
       } else {
-        const arr = await inputValue;
+        const arr = await fetch(inputValue);
         resolve([
           ...fakeOptions,
           ...arr,
@@ -140,7 +140,7 @@ const Select: React.FC<Props> = ({
 
   return (
     <div
-      className={`w-full  ${isDisabled ? "cursor-not-allowed" : ""}`}
+      className={`w-full ${isDisabled ? "cursor-not-allowed" : ""}`}
       ref={inputRef}
     >
       {label && <InputLabel label={label} />}
@@ -149,6 +149,7 @@ const Select: React.FC<Props> = ({
         hideSelectedOptions={hideSelectedOptions}
         loadOptions={loadOptions}
         defaultOptions={defaultOptions}
+        isMulti={isMulti}
         ref={selectRef}
         isClearable={isClearable}
         value={value || null}
@@ -207,7 +208,8 @@ const Select: React.FC<Props> = ({
           control: (provided: any, state: any) => {
             return {
               ...provided,
-              boxShadow: "none",
+              boxShadow:
+                " 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
               background: "transparent",
               border: controlStyles
                 ? "transparent"
@@ -218,7 +220,7 @@ const Select: React.FC<Props> = ({
                 borderColor: state.isFocused ? "#e91756" : "#9ca3af",
               },
               ...controlStyles,
-              ...(!containerStyles ? { height: 32 } : {}),
+              ...(!containerStyles ? { height: 50, borderRadius: "8px" } : {}),
             };
           },
           singleValue: (provided: any, state: any) => {
@@ -250,7 +252,7 @@ const Select: React.FC<Props> = ({
             };
           },
         }}
-        className="border border-solid border-gray-400 rounded-md text-sm bg-transparent font-primary  dark:text-white"
+        className="border border-solid border-gray-400 rounded-lg text-sm bg-transparent  font-primary  dark:text-white"
         placeholder={placeholder || ""}
       />
     </div>

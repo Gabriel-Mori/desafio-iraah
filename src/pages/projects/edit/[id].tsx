@@ -20,7 +20,7 @@ const Edit: NextPage = ({ projects }: any) => {
             <button
               className={` text-gray-700 dark:text-white rounded-full px-6 py-1 ml-3`}
               onClick={() => {
-                router.push("/clients/list");
+                router.push("/projects/list");
               }}
             >
               <div className="flex items-center mt-3 ">

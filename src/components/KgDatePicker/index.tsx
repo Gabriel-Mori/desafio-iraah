@@ -33,8 +33,8 @@ const KgDatePicker: React.FC<Props> = ({
   return (
     <div
       className={`${icon ? "px-4" : ""} h-11 ${
-        disabled ? "bg-gray-100" : "bg-white"
-      } w-full border border-solid border-gray-400 focus-within:border-primary rounded-md flex overflow-hidden items-center ${className}`}
+        disabled ? "bg-gray-300" : "bg-gray-200"
+      } w-full border border-solid border-gray-400 focus-within:border-primary shadow-2xl rounded-md flex overflow-hidden items-center ${className}`}
     >
       {icon}
       <DatePicker

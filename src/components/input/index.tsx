@@ -16,6 +16,7 @@ interface Props {
   inputRef?: any;
   label?: string;
   disabled?: boolean;
+  maxlength?: number;
 }
 
 const Input: React.FC<Props> = ({
@@ -32,6 +33,7 @@ const Input: React.FC<Props> = ({
   inputRef,
   label,
   disabled,
+  maxlength,
 }) => {
   const [inputType, setInputType] = useState(type);
   return (
@@ -52,6 +54,7 @@ const Input: React.FC<Props> = ({
           ref={inputRef}
           style={{ borderRadius: "14px" }}
           type={inputType}
+          maxLength={maxlength}
           placeholder={placeholder}
           autoFocus={autoFocus}
           value={value}

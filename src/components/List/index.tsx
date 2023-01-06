@@ -19,8 +19,11 @@ const HeaderColumn = ({ col, onSortChange, sortDir, sortField }: any) => {
 
   return (
     <div
-      style={{ maxWidth: col.props.width, textAlign: col.props.align }}
-      className={`flex-1 text-sm text-gray-800 dark:text-white font-semibold mr-6 ${
+      style={{
+        maxWidth: col.props.width,
+        textAlign: col.props.align,
+      }}
+      className={`flex-1 text-sm text-gray-800  dark:text-white font-semibold mr-6 ${
         col.props.sortable ? "cursor-pointer" : ""
       }`}
       onClick={() => {
@@ -69,7 +72,7 @@ const List: React.FC<Props> = ({
 
   const header = () => {
     return (
-      <div className="flex flex-row px-6 py-2 border-b">
+      <div className="flex flex-row px-6 py-2 border-b ">
         {columns.map((col, i) => (
           <HeaderColumn
             col={col}
@@ -110,9 +113,9 @@ const List: React.FC<Props> = ({
   };
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-auto">
       <div
-        className="w-full"
+        className="w-full  max-h-[550px] "
         style={{ minWidth: minWidth ? minWidth : "auto", minHeight: 124 }}
       >
         {!loading && data.length > 0 && (
@@ -121,7 +124,7 @@ const List: React.FC<Props> = ({
           </div>
         )}
         {data.length === 0 && !loading && (
-          <div className="flex h-64 flex-col items-center justify-center">
+          <div className="flex h-64 flex-col items-center justify-center ">
             <FiSearch size={100} className="text-gray-300 " />
             <span className=" text-xl font-semibold text-gray-400 mt-4">
               Nenhum dado encontrado

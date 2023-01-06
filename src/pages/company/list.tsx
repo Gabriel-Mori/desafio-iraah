@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import Base from "../../components/Base";
 import { useRouter } from "next/router";
-import ProjectsList from "../../components/Project/project-list";
+import CompanyList from "../../components/company/list-company";
 
 const ListPage: NextPage = () => {
   const router = useRouter();
@@ -9,8 +9,8 @@ const ListPage: NextPage = () => {
   return (
     <Base>
       <div className="mt-8">
-        <label className="text-3xl mt-5 mb-5">Listagem de Projetos</label>
-        <ProjectsList />
+        <label className="text-3xl mt-5 mb-5">Listagem de empresas</label>
+        <CompanyList />
       </div>
     </Base>
   );

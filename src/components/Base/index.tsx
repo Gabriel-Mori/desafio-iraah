@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useUser } from "../../contexts/UserContext";
 import { CaretDown, Moon, SignOut, Sun } from "phosphor-react";
-import { OrganizationInterface } from "../../interfaces/organization.interface";
-import { type } from "os";
+import isAdmin from "../../pages/isAdmin";
 // import Select from "../Select";
 
 type Props = {
@@ -18,17 +17,32 @@ const Base: React.FC<Props> = ({ children }) => {
       type: "Clients",
       name: "Clientes",
       url: "/clients/list",
+      activeUrl: "/clients/",
+    },
+    {
+      type: "Company",
+      name: "Empresa",
+      url: "/company/list",
+      activeUrl: "/company/",
     },
     {
       type: "Projects",
       name: "Projeto",
       url: "/projects/list",
+      activeUrl: "/projects/",
     },
-    // {
-    //   type: "GRAPH",
-    //   name: "Gráficos",
-    //   url: "/graph",
-    // },
+    {
+      type: "Collaborator",
+      name: "Colaboradores",
+      url: "/collaborator/list",
+      activeUrl: "/collaborator/",
+    },
+    {
+      type: "Timesheet",
+      name: "Lançamentos",
+      url: "/timesheet/list",
+      activeUrl: "/timesheet/",
+    },
   ];
 
   const { theme, toogleTheme } = useTheme();
@@ -67,7 +81,7 @@ const Base: React.FC<Props> = ({ children }) => {
                       <li
                         key={item.type}
                         className={`mr-10 rounded-full px-6 py-2 cursor-pointer   ${
-                          router.asPath !== item.url
+                          !router.asPath.includes(item.activeUrl)
                             ? "text-gray-900 dark:text-white hover:bg-gray-200"
                             : " bg-orange-400 text-white"
                         }`}
@@ -129,7 +143,7 @@ const Base: React.FC<Props> = ({ children }) => {
           </header>
         </div>
       </div>
-      <main className="bg-gray-200 dark:bg-custom-black flex-1 overflow-hidden">
+      <main className="bg-gray-200 dark:bg-custom-black flex-1  overflow-hidden">
         <div className="container mx-auto  md:px-0 h-screen w-screen">
           {children}
         </div>
