@@ -41,7 +41,7 @@ export default Edit;
 
 export const getServerSideProps = async (context: any) => {
   const company = await http
-    .get(`/customer/${context.params.id}`)
+    .get(`/company/${context.params.id}`)
     .then((resp) => resp.data);
 
   return {

@@ -51,7 +51,7 @@ const TimeSheetForm: React.FC<Props> = ({ initialData }: any) => {
   };
 
   const getEmployee = (searchTerm: any = "") => {
-    return http.get(`/employee?searchTerm=${searchTerm}`).then((resp) => {
+    return http.get(`/employee/v2?searchTerm=${searchTerm}`).then((resp) => {
       return resp.data.content;
     });
   };
@@ -62,10 +62,10 @@ const TimeSheetForm: React.FC<Props> = ({ initialData }: any) => {
         <Input
           label="Descrição"
           type="textarea"
-          value={timesheet.descriptiont}
+          value={timesheet.description}
           className={`border border-slate-400  mb-5 shadow-xl`}
           placeholder="Realizado troca de label ..."
-          onChange={(e: any) => handleInputValue(e, "descriptiont")}
+          onChange={(e: any) => handleInputValue(e, "description")}
         />
 
         <div className="w-full mr-4 ">
@@ -104,7 +104,6 @@ const TimeSheetForm: React.FC<Props> = ({ initialData }: any) => {
               type="time"
               value={timesheet.hoursWorked}
               className={`border rounded-md border-slate-400 outline-none p-3 h-11 w-60 shadow-xl bg-gray-200`}
-              placeholder="Realizado troca de label ..."
               onChange={(e: any) => handleInputValue(e, "hoursWorked")}
             />
           </div>

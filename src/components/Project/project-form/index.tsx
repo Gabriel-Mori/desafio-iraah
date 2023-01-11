@@ -19,20 +19,9 @@ interface Props {
 
 const FormProject: React.FC<Props> = ({ initialData }: any) => {
   const [project, setProject] = useState<any>(initialData || {});
-  const [client, setClient] = useState<any>([]);
-  const [search, setSearch] = useState<any>([]);
   const router = useRouter();
 
   const submitForm = async () => {
-    if (project.startDate > project?.endDate) {
-      toast.error("Falha ao salvar, data de início é maior que final", {
-        icon: <MdWarning size={22} className="text-yellow-400" />,
-        autoClose: 3000,
-        theme: "colored",
-      });
-      return;
-    }
-
     await toast.promise(OrganizationService.formProjectSubmit({ ...project }), {
       pending: "Verificando dados",
       success: {
@@ -55,22 +44,32 @@ const FormProject: React.FC<Props> = ({ initialData }: any) => {
     }, 1000);
   };
 
+  console.log(project);
+
   const getClientSelect = (searchTerm: any = "") => {
-    return http.get(`/customer?searchTerm=${searchTerm}`).then((resp) => {
+    return http.get(`/customer/v2?searchTerm=${searchTerm}`).then((resp) => {
       return resp.data.content;
     });
   };
 
   const getEmployee = (searchTerm: any = "") => {
-    return http.get(`/employee?searchTerm=${searchTerm}`).then((resp) => {
+    return http.get(`/employee/v2?searchTerm=${searchTerm}`).then((resp) => {
+      return resp.data.content;
+    });
+  };
+  const getSupervisor = () => {
+    return http.get(`/employee/supervisor`).then((resp) => {
       return resp.data;
     });
   };
 
   const handleInputValue = (e: any, name: string) => {
+    const value = e.target.value;
+    const firstLetter = value.charAt(0).toUpperCase();
+    const restWord = value.slice(1);
     setProject({
       ...project,
-      [name]: e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1),
+      [name]: firstLetter + restWord,
     });
   };
 
@@ -112,11 +111,24 @@ const FormProject: React.FC<Props> = ({ initialData }: any) => {
             isMulti={true}
           />
         </div>
+        <div className="w-full mr-4  mt-4">
+          <Label label="Supervisor" />
+          <Select
+            placeholder="Selecione o Supervisor"
+            onChange={(_, value) => {
+              setProject({ ...project, supervisor: value });
+            }}
+            fetch={getSupervisor}
+            value={project.supervisor}
+            fieldLabel="name"
+            isMulti={true}
+          />
+        </div>
 
         <div className="flex flex-col mt-5">
           <Label label="Datas" />
         </div>
-        <div className="flex   justify-start mb-3 ">
+        <div className="flex justify-start mb-3 ">
           <div className=" flex items-center">
             <label className="mr-2 dark:text-white text-4xl sm:text-base font-semibold text-font-color-light-gray">
               De:

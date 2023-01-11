@@ -6,14 +6,54 @@ import { HiPlus, HiTrash } from "react-icons/hi2";
 import { useRouter } from "next/router";
 import http from "../../../http";
 import { OrganizationService } from "../../../services/organizations-service";
+import Pagination from "react-js-pagination";
+import PureModal from "react-pure-modal";
+import "react-pure-modal/dist/react-pure-modal.min.css";
+import { toast } from "react-toastify";
+import { IoCheckmarkDoneSharp } from "react-icons/io5";
+import { VscChromeClose } from "react-icons/vsc";
+import Input from "../../input";
+
+interface CompanyProps {
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  content: [];
+  pageable?: any;
+  searchTerm?: string;
+}
 
 const CompanyList: React.FC = () => {
-  const [company, setCompany] = useState([]);
   const router = useRouter();
+  const [showModal, setShowModal] = useState(false);
+  const [deletedItem, setDeletedItem] = useState<any>({});
+  const [inputValue, setInputValue] = useState("");
+  const [messageError, setMessageError] = useState("");
+  const [pagination, setPagination] = useState<CompanyProps>({
+    pageNumber: 1,
+    pageSize: 10,
+    totalElements: 1,
+    content: [],
+    pageable: {},
+    searchTerm: "",
+  });
 
-  const searchCompany = (searchTerm: any = "") => {
-    OrganizationService.getCompany(searchTerm).then((response) =>
-      setCompany(response.data)
+  const searchCompany = (
+    searchTerm: any = "",
+    pageNumber = 1,
+    pageSize = 10
+  ) => {
+    OrganizationService.getCompany(searchTerm, pageSize, pageNumber).then(
+      (response) => {
+        console.log(response);
+        setPagination({
+          ...pagination,
+          searchTerm,
+          pageSize,
+          pageNumber,
+          ...response.data,
+        });
+      }
     );
   };
 
@@ -22,22 +62,26 @@ const CompanyList: React.FC = () => {
     searchCompany(value);
   };
 
-  const deleteCompany = async (id: any) => {
-    await http.delete(`/company/${id}`);
-    searchCompany();
-  };
-
-  const handlePhone = (event: any) => {
-    let input = event.target;
-    input.value = phoneMask(input.value);
-  };
-
-  const phoneMask = (value: any) => {
-    value = value.replace(/\D/g, "");
-    value = value.replace(/(\d{2})(\d)/, "($1) $2");
-    value = value.replace(/(\d)(\d{4})$/, "$1-$2");
-
-    return value;
+  const deleteCompany = async () => {
+    const value = inputValue.toUpperCase();
+    if (value === "CONFIRMAR") {
+      await http.delete(`/company/${deletedItem.id}`);
+      toast.success("Item deletado", {
+        position: "top-right",
+        icon: <IoCheckmarkDoneSharp size={22} className="text-green-900" />,
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      searchCompany();
+      setShowModal(false);
+    } else {
+      setMessageError("Digite 'Confirmar' para deletar item");
+    }
   };
 
   useEffect(() => {
@@ -74,10 +118,13 @@ const CompanyList: React.FC = () => {
           </button>
         </div>
       </div>
-      {company && (
+      {pagination.content && (
         <div className="shadow-2xl border bg-slate-100 rounded">
           <div className="p-2 ">
-            <List data={company ? company : []} minWidth={1000}>
+            <List
+              data={pagination.content ? pagination.content : []}
+              minWidth={1000}
+            >
               <ListColumn
                 name="name"
                 label="Nome"
@@ -153,15 +200,17 @@ const CompanyList: React.FC = () => {
                 label="Deletar"
                 render={(row) => (
                   <div className="flex  justify-end  text-gray-500">
-                    <label className="cursor-pointer mr-2">
+                    <button className="cursor-pointer mr-2">
                       <HiTrash
                         size={22}
                         style={{ color: "#ff0000" }}
                         onClick={() => {
-                          deleteCompany(row.id);
+                          setMessageError("");
+                          setDeletedItem(row);
+                          setShowModal(true);
                         }}
                       />
-                    </label>
+                    </button>
                   </div>
                 )}
                 align="right"
@@ -170,6 +219,59 @@ const CompanyList: React.FC = () => {
           </div>
         </div>
       )}
+      <div className="flex items-center  justify-center">
+        <Pagination
+          activeLinkClass="bg-[#0cbcbe] p-3  rounded-full"
+          itemClass="mx-3"
+          innerClass="flex mt-4 p-3"
+          totalItemsCount={pagination.totalElements}
+          activePage={pagination.pageNumber}
+          itemsCountPerPage={pagination.pageSize}
+          onChange={(pageNumber) => {
+            searchCompany(
+              pagination.searchTerm,
+              pageNumber,
+              pagination.pageSize
+            );
+          }}
+        />
+      </div>
+      <PureModal
+        header="Deletar item"
+        isOpen={showModal}
+        closeButton={
+          <VscChromeClose size={20} className="text-gray-700 mt-1" />
+        }
+        onClose={() => {
+          setShowModal(false);
+          setInputValue("");
+        }}
+      >
+        <div className="flex flex-col " style={{ maxWidth: 300 }}>
+          <p className="leading-5 mb-5 break-normal text-center">
+            Deseja deletar este item?
+          </p>
+          <Input
+            value={inputValue}
+            onChange={(e: any) => {
+              setInputValue(e.target.value);
+              setMessageError("");
+            }}
+            placeholder='Digite "Confirmar" para deletar item'
+            type="text"
+            className="border border-solid border-gray-400 rounded-md py-3 px-4 mb-4"
+          />
+          {messageError && <p className="text-red-400 ">{messageError}</p>}
+          <button
+            className="bg-gray-800 rounded-full py-3 text-white outline-none"
+            onClick={() => {
+              deleteCompany();
+            }}
+          >
+            Deletar
+          </button>
+        </div>
+      </PureModal>
     </div>
   );
 };

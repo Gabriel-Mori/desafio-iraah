@@ -143,7 +143,7 @@ const Base: React.FC<Props> = ({ children }) => {
           </header>
         </div>
       </div>
-      <main className="bg-gray-200 dark:bg-custom-black flex-1  overflow-hidden">
+      <main className="bg-gray-200 dark:bg-custom-black flex-1   overflow-hidden">
         <div className="container mx-auto  md:px-0 h-screen w-screen">
           {children}
         </div>

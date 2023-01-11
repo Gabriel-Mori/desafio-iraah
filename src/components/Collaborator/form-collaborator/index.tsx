@@ -16,7 +16,7 @@ interface Props {
 const CollaboratorForm: React.FC<Props> = ({ initialData }: any) => {
   const [collaborator, setCollaborator] = useState<any>(initialData || {});
   const router = useRouter();
-
+  console.log(initialData);
   const handleSubmitChange = async () => {
     await toast.promise(
       OrganizationService.CollaboratorForm({ ...collaborator }),
@@ -31,7 +31,7 @@ const CollaboratorForm: React.FC<Props> = ({ initialData }: any) => {
         },
         error: {
           render() {
-            return "Salvo com sucesso";
+            return "Falha ao salvar";
           },
           icon: <MdWarning size={22} className="text-yellow-200" />,
           theme: "colored",
@@ -44,11 +44,28 @@ const CollaboratorForm: React.FC<Props> = ({ initialData }: any) => {
   };
 
   const handleInputValue = (e: any, name: string) => {
+    const value = e.target.value;
+    const firstLetter = value.charAt(0).toUpperCase();
+    const restWord = value.slice(1);
     setCollaborator({
       ...collaborator,
-      [name]: e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1),
+      [name]: firstLetter + restWord,
     });
   };
+
+  const handlePhone = (event: any) => {
+    let input = event.target;
+    input.value = phoneMask(input.value);
+  };
+
+  const phoneMask = (value: any) => {
+    value = value.replace(/\D/g, "");
+    value = value.replace(/(\d{2})(\d)/, "($1) $2");
+    value = value.replace(/(\d)(\d{4})$/, "$1-$2");
+    setCollaborator({ ...collaborator, cellphone: value });
+    return value;
+  };
+  console.log(collaborator);
 
   return (
     <>
@@ -60,13 +77,14 @@ const CollaboratorForm: React.FC<Props> = ({ initialData }: any) => {
           placeholder="Nome"
           onChange={(e: any) => handleInputValue(e, "name")}
         />
-        {/* <Input
-          label="Empresa"
-          value={collaborator.companyName}
+        <Input
+          label="Telefone"
+          value={collaborator.cellphone}
           className="border border-slate-400  mb-5 shadow-xl "
-          placeholder="Netflix..."
-          onChange={(e: any) => handleInputValue(e, "companyName")}
-        /> */}
+          placeholder="(44)99932-0453"
+          onChange={(e: any) => handlePhone(e)}
+          maxlength={15}
+        />
         <Input
           label="Email"
           type="email"
@@ -75,6 +93,19 @@ const CollaboratorForm: React.FC<Props> = ({ initialData }: any) => {
           placeholder="Email@gmail.com"
           onChange={(e: any) => handleInputValue(e, "email")}
         />
+        <div>
+          <input
+            className={` w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 
+            rounded-full focus:ring-blue-500 dark:focus:ring-blue-600`}
+            checked={collaborator.supervisor}
+            value={collaborator.supervisor}
+            type="checkbox"
+            onChange={(e: any) =>
+              setCollaborator({ ...collaborator, supervisor: e.target.checked })
+            }
+          />
+          <span className="ml-2 text-gray-900 text-2xl">Supervisor</span>
+        </div>
       </form>
       <div className="flex justify-center mt-16">
         <button

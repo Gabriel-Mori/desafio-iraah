@@ -6,14 +6,55 @@ import { HiPlus, HiTrash } from "react-icons/hi2";
 import { useRouter } from "next/router";
 import http from "../../../http";
 import { OrganizationService } from "../../../services/organizations-service";
+import Pagination from "react-js-pagination";
+import { VscChromeClose } from "react-icons/vsc";
+import PureModal from "react-pure-modal";
+import "react-pure-modal/dist/react-pure-modal.min.css";
+import Input from "../../input";
+import { toast } from "react-toastify";
+import { IoCheckmarkDoneSharp } from "react-icons/io5";
+import { MdWarning } from "react-icons/md";
+
+interface PaginationProps {
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  content: [];
+  pageable?: any;
+  searchTerm?: string;
+}
 
 const ClientList: React.FC = () => {
-  const [response, setResponse] = useState([]);
   const router = useRouter();
+  const [showModal, setShowModal] = useState(false);
+  const [deletedItem, setDeletedItem] = useState<any>({});
+  const [inputValue, setInputValue] = useState("");
+  const [messageError, setMessageError] = useState("");
+  const [pagination, setPagination] = useState<PaginationProps>({
+    pageNumber: 1,
+    pageSize: 10,
+    totalElements: 1,
+    content: [],
+    pageable: {},
+    searchTerm: "",
+  });
 
-  const searchClients = (searchTerm: any = "") => {
-    OrganizationService.getClient(searchTerm).then((response) =>
-      setResponse(response.data)
+  const searchClients = (
+    searchTerm: any = "",
+    pageNumber = 1,
+    pageSize = 10
+  ) => {
+    OrganizationService.getClient(searchTerm, pageSize, pageNumber).then(
+      (response) => {
+        console.log(response);
+        setPagination({
+          ...pagination,
+          searchTerm,
+          pageSize,
+          pageNumber,
+          ...response.data,
+        });
+      }
     );
   };
 
@@ -22,9 +63,26 @@ const ClientList: React.FC = () => {
     searchClients(value);
   };
 
-  const deleteClientFromList = async (id: any) => {
-    await http.delete(`/customer/${id}`);
-    searchClients();
+  const deleteClientFromList = async () => {
+    const value = inputValue.toUpperCase();
+    if (value === "CONFIRMAR") {
+      await http.delete(`/customer/${deletedItem.id}`);
+      toast.success("Item deletado", {
+        position: "top-right",
+        icon: <IoCheckmarkDoneSharp size={22} className="text-green-900" />,
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      searchClients();
+      setShowModal(false);
+    } else {
+      setMessageError("Digite 'Confirmar' para deletar item");
+    }
   };
 
   useEffect(() => {
@@ -62,10 +120,13 @@ const ClientList: React.FC = () => {
         </div>
       </div>
 
-      {response && (
-        <div className="shadow-2xl border bg-slate-100 rounded">
+      {pagination.content && (
+        <div className="shadow-2xl border bg-slate-100 rounded ">
           <div className="p-2 ">
-            <List data={response ? response : []} minWidth={1000}>
+            <List
+              data={pagination.content ? pagination.content : []}
+              minWidth={1000}
+            >
               <ListColumn
                 name="name"
                 label="Nome"
@@ -84,7 +145,9 @@ const ClientList: React.FC = () => {
                 render={(row) => (
                   <div>
                     <label className="text-gray-900">
-                      {row.company ? row.company.companyName : "----"}
+                      {row.company?.companyName
+                        ? row.company.companyName
+                        : "----"}
                     </label>
                   </div>
                 )}
@@ -123,16 +186,18 @@ const ClientList: React.FC = () => {
                 name="delete"
                 label="Deletar"
                 render={(row) => (
-                  <div className="flex  justify-end  text-gray-500">
-                    <label className="cursor-pointer mr-2">
+                  <div className="flex  justify-end  text-gray-500 ">
+                    <button className="cursor-pointer mr-2">
                       <HiTrash
                         size={22}
                         style={{ color: "#ff0000" }}
                         onClick={() => {
-                          deleteClientFromList(row.id);
+                          setMessageError("");
+                          setDeletedItem(row);
+                          setShowModal(true);
                         }}
                       />
-                    </label>
+                    </button>
                   </div>
                 )}
                 align="right"
@@ -141,6 +206,60 @@ const ClientList: React.FC = () => {
           </div>
         </div>
       )}
+      <div className="flex items-center  justify-center">
+        <Pagination
+          activeLinkClass="bg-[#0cbcbe] p-3  rounded-full"
+          itemClass="mx-3"
+          innerClass="flex mt-4 p-3"
+          totalItemsCount={pagination.totalElements}
+          activePage={pagination.pageNumber}
+          itemsCountPerPage={pagination.pageSize}
+          onChange={(pageNumber) => {
+            searchClients(
+              pagination.searchTerm,
+              pageNumber,
+              pagination.pageSize
+            );
+          }}
+        />
+      </div>
+
+      <PureModal
+        header="Deletar item"
+        isOpen={showModal}
+        closeButton={
+          <VscChromeClose size={20} className="text-gray-700 mt-1" />
+        }
+        onClose={() => {
+          setShowModal(false);
+          setInputValue("");
+        }}
+      >
+        <div className="flex flex-col " style={{ maxWidth: 300 }}>
+          <p className="leading-5 mb-5 break-normal text-center">
+            Deseja deletar este item?
+          </p>
+          <Input
+            value={inputValue}
+            onChange={(e: any) => {
+              setInputValue(e.target.value);
+              setMessageError("");
+            }}
+            placeholder='Digite "Confirmar" para deletar item'
+            type="text"
+            className="border border-solid border-gray-400 rounded-md py-3 px-4 mb-4"
+          />
+          {messageError && <p className="text-red-400 ">{messageError}</p>}
+          <button
+            className="bg-gray-800 rounded-full py-3 text-white outline-none"
+            onClick={() => {
+              deleteClientFromList();
+            }}
+          >
+            Deletar
+          </button>
+        </div>
+      </PureModal>
     </div>
   );
 };

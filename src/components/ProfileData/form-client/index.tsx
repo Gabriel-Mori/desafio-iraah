@@ -52,9 +52,9 @@ const ClientForm: React.FC<Props> = ({ initialData }: any) => {
     });
   };
 
-  const getCompany = (searchTerm: any = "") => {
-    return http.get(`/company?searchTerm=${searchTerm}`).then((resp) => {
-      return resp.data;
+  const getCompany = (searchTerm?: any) => {
+    return http.get(`/company/v2?searchTerm=${searchTerm}`).then((resp) => {
+      return resp.data.content;
     });
   };
 

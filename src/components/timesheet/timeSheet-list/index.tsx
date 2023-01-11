@@ -8,27 +8,76 @@ import http from "../../../http";
 import { OrganizationService } from "../../../services/organizations-service";
 import { Tooltip, dividerClasses } from "@mui/material";
 import moment from "moment";
+import Pagination from "react-js-pagination";
+import { IoCheckmarkDoneSharp } from "react-icons/io5";
+import { toast } from "react-toastify";
+import PureModal from "react-pure-modal";
+import "react-pure-modal/dist/react-pure-modal.min.css";
+import { VscChromeClose } from "react-icons/vsc";
+import Input from "../../input";
+
+interface TimesheetProps {
+  pageNumber: number;
+  pageSize: number;
+  totalElements: number;
+  content: [];
+  pageable?: any;
+  employee?: number;
+}
 
 const TimeSheetList: React.FC = () => {
-  const [timeSheetRes, setTimeSheetRes] = useState([]);
   const router = useRouter();
+  const [showModal, setShowModal] = useState(false);
+  const [deletedItem, setDeletedItem] = useState<any>({});
+  const [inputValue, setInputValue] = useState("");
+  const [messageError, setMessageError] = useState("");
+  const [pagination, setPagination] = useState<TimesheetProps>({
+    pageNumber: 1,
+    pageSize: 10,
+    totalElements: 1,
+    content: [],
+    pageable: {},
+  });
 
-  const getTimeSheet = () => {
-    OrganizationService.getTimeSheet().then((response) =>
-      setTimeSheetRes(response.data)
-    );
+  const getTimeSheets = (pageNumber = 1, pageSize = 10) => {
+    OrganizationService.getTimeSheet(pageSize, pageNumber).then((response) => {
+      console.log(response);
+      setPagination({
+        ...pagination,
+        pageSize,
+        pageNumber,
+        ...response.data,
+      });
+    });
   };
 
-  const deleteFromList = async (id: any) => {
-    await http.delete(`/timesheet/${id}`);
-    getTimeSheet();
+  const deleteFromList = async () => {
+    const value = inputValue.toUpperCase();
+    if (value === "CONFIRMAR") {
+      await http.delete(`/timesheet/${deletedItem.id}`);
+      toast.success("Item deletado", {
+        position: "top-right",
+        icon: <IoCheckmarkDoneSharp size={22} className="text-green-900" />,
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      getTimeSheets();
+      setShowModal(false);
+    } else {
+      setMessageError("Digite 'Confirmar' para deletar item");
+    }
   };
 
   useEffect(() => {
-    getTimeSheet();
+    getTimeSheets();
   }, []);
 
-  const edit = (id: any) => {
+  const editFromList = (id: any) => {
     router.push(`/timesheet/edit/${id}`);
   };
 
@@ -58,10 +107,13 @@ const TimeSheetList: React.FC = () => {
           </button>
         </div>
       </div>
-      {timeSheetRes && (
+      {pagination.content && (
         <div className="shadow-2xl border rounded  bg-slate-100">
           <div className="p-4  ">
-            <List data={timeSheetRes ? timeSheetRes : []} minWidth={1000}>
+            <List
+              data={pagination.content ? pagination.content : []}
+              minWidth={1000}
+            >
               <ListColumn
                 name="employee"
                 label="Colaborador"
@@ -131,6 +183,18 @@ const TimeSheetList: React.FC = () => {
                 )}
                 align="center"
               />
+              {/* <ListColumn
+                name="approved"
+                label="Status"
+                render={(row) => (
+                  <div>
+                    <label className="text-gray-900">
+                      {row.approved ? "Aprovado" : "Pendente"}
+                    </label>
+                  </div>
+                )}
+                align="center"
+              /> */}
               <ListColumn
                 name="edit"
                 label="Editar"
@@ -140,7 +204,7 @@ const TimeSheetList: React.FC = () => {
                       <FiEdit
                         size={22}
                         onClick={() => {
-                          edit(row.id);
+                          editFromList(row.id);
                         }}
                       />
                     </label>
@@ -153,15 +217,17 @@ const TimeSheetList: React.FC = () => {
                 label="Deletar"
                 render={(row) => (
                   <div className="flex  justify-end  text-gray-500">
-                    <label className="cursor-pointer mr-2">
+                    <button className="cursor-pointer mr-2">
                       <HiTrash
                         size={22}
                         style={{ color: "#ff0000" }}
                         onClick={() => {
-                          deleteFromList(row.id);
+                          setMessageError("");
+                          setDeletedItem(row);
+                          setShowModal(true);
                         }}
                       />
-                    </label>
+                    </button>
                   </div>
                 )}
                 align="right"
@@ -170,6 +236,55 @@ const TimeSheetList: React.FC = () => {
           </div>
         </div>
       )}
+      <div className="flex items-center  justify-center">
+        <Pagination
+          activeLinkClass="bg-[#0cbcbe] p-3  rounded-full"
+          itemClass="mx-3"
+          innerClass="flex mt-4 p-3"
+          totalItemsCount={pagination.totalElements}
+          activePage={pagination.pageNumber}
+          itemsCountPerPage={pagination.pageSize}
+          onChange={(pageNumber) => {
+            getTimeSheets(pageNumber, pagination.pageSize);
+          }}
+        />
+      </div>
+      <PureModal
+        header="Deletar item"
+        isOpen={showModal}
+        closeButton={
+          <VscChromeClose size={20} className="text-gray-700 mt-1" />
+        }
+        onClose={() => {
+          setShowModal(false);
+          setInputValue("");
+        }}
+      >
+        <div className="flex flex-col " style={{ maxWidth: 300 }}>
+          <p className="leading-5 mb-5 break-normal text-center">
+            Deseja deletar este item?
+          </p>
+          <Input
+            value={inputValue}
+            onChange={(e: any) => {
+              setInputValue(e.target.value);
+              setMessageError("");
+            }}
+            placeholder='Digite "Confirmar" para deletar item'
+            type="text"
+            className="border border-solid border-gray-400 rounded-md py-3 px-4 mb-4"
+          />
+          {messageError && <p className="text-red-400 ">{messageError}</p>}
+          <button
+            className="bg-gray-800 rounded-full py-3 text-white outline-none"
+            onClick={() => {
+              deleteFromList();
+            }}
+          >
+            Deletar
+          </button>
+        </div>
+      </PureModal>
     </div>
   );
 };

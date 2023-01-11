@@ -41,9 +41,12 @@ const CompanyFormIsFrom: React.FC<Props> = ({ initialData }: any) => {
   };
 
   const handleInputValue = (e: any, name: string) => {
+    const value = e.target.value;
+    const firstLetter = value.charAt(0).toUpperCase();
+    const restWord = value.slice(1);
     setCompany({
       ...company,
-      [name]: e.target.value.charAt(0).toUpperCase() + e.target.value.slice(1),
+      [name]: firstLetter + restWord,
     });
   };
 
