@@ -27,7 +27,7 @@ interface CollaboratorProps {
 const CollaboratorList: React.FC = () => {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
-  const [deletedItem, setDeletedItem] = useState<any>({});
+  const [selectedItem, setSelectedItem] = useState<any>({});
   const [inputValue, setInputValue] = useState("");
   const [messageError, setMessageError] = useState("");
   const [pagination, setPagination] = useState<CollaboratorProps>({
@@ -46,7 +46,6 @@ const CollaboratorList: React.FC = () => {
   ) => {
     OrganizationService.getCollaborator(searchTerm, pageSize, pageNumber).then(
       (response) => {
-        console.log(response);
         setPagination({
           ...pagination,
           searchTerm,
@@ -64,9 +63,8 @@ const CollaboratorList: React.FC = () => {
   };
 
   const deleteFromList = async () => {
-    const value = inputValue.toUpperCase();
-    if (value === "CONFIRMAR") {
-      await http.delete(`/employee/${deletedItem.id}`);
+    if (inputValue === "Confirmar") {
+      await http.delete(`/employee/${selectedItem.id}`);
       toast.success("Item deletado", {
         position: "top-right",
         icon: <IoCheckmarkDoneSharp size={22} className="text-green-900" />,
@@ -102,7 +100,6 @@ const CollaboratorList: React.FC = () => {
             <input
               style={{ borderRadius: "14px" }}
               className={`bg-transparent h-14 outline-none flex-1 w-full pl-5 border border-solid border-slate-400`}
-              placeholder="João..."
               onChange={(e: any) => handleInputSearch(e)}
             />
           </div>
@@ -203,7 +200,7 @@ const CollaboratorList: React.FC = () => {
                         style={{ color: "#ff0000" }}
                         onClick={() => {
                           setMessageError("");
-                          setDeletedItem(row);
+                          setSelectedItem(row);
                           setShowModal(true);
                         }}
                       />
@@ -216,10 +213,12 @@ const CollaboratorList: React.FC = () => {
                 name="timeline"
                 label="Histórico"
                 render={(row) => (
+                  // console.log(row)
                   <div>
                     <button
                       onClick={() => {
-                        router.push("/timeline/");
+                        setSelectedItem(row);
+                        router.push(`/timeline/${row.id}`);
                       }}
                     >
                       {<HiDotsVertical />}
@@ -234,7 +233,7 @@ const CollaboratorList: React.FC = () => {
       )}
       <div className="flex items-center  justify-center">
         <Pagination
-          activeLinkClass="bg-[#0cbcbe] p-3  rounded-full"
+          activeLinkClass="bg-[#0cbcbe] p-3 text-white rounded-full"
           itemClass="mx-3"
           innerClass="flex mt-4 p-3"
           totalItemsCount={pagination.totalElements}
@@ -252,6 +251,7 @@ const CollaboratorList: React.FC = () => {
       <PureModal
         header="Deletar item"
         isOpen={showModal}
+        className="w-96"
         closeButton={
           <VscChromeClose size={20} className="text-gray-700 mt-1" />
         }

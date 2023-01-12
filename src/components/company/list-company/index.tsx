@@ -45,7 +45,6 @@ const CompanyList: React.FC = () => {
   ) => {
     OrganizationService.getCompany(searchTerm, pageSize, pageNumber).then(
       (response) => {
-        console.log(response);
         setPagination({
           ...pagination,
           searchTerm,
@@ -63,8 +62,8 @@ const CompanyList: React.FC = () => {
   };
 
   const deleteCompany = async () => {
-    const value = inputValue.toUpperCase();
-    if (value === "CONFIRMAR") {
+    // try {
+    if (inputValue === "Confirmar") {
       await http.delete(`/company/${deletedItem.id}`);
       toast.success("Item deletado", {
         position: "top-right",
@@ -82,6 +81,11 @@ const CompanyList: React.FC = () => {
     } else {
       setMessageError("Digite 'Confirmar' para deletar item");
     }
+    // } catch (error) {
+    //   console.log(error);
+    //   const { data } = error.response;
+    //   alert(data.message);
+    // }
   };
 
   useEffect(() => {
@@ -97,11 +101,11 @@ const CompanyList: React.FC = () => {
       <div className="mt-8">
         <div className="flex justify-between items-center mb-6">
           <div className="w-full">
-            <h2 className="mb-2">Pesquise por nome do cliente</h2>
+            <h2 className="mb-2">Pesquise por nome da empresa</h2>
             <input
               style={{ borderRadius: "14px" }}
               className={`bg-transparent h-14 outline-none flex-1 w-full pl-5 border border-solid border-slate-400`}
-              placeholder="João..."
+              placeholder=""
               onChange={(e: any) => handleInputSearch(e)}
             />
           </div>
@@ -221,9 +225,9 @@ const CompanyList: React.FC = () => {
       )}
       <div className="flex items-center  justify-center">
         <Pagination
-          activeLinkClass="bg-[#0cbcbe] p-3  rounded-full"
-          itemClass="mx-3"
-          innerClass="flex mt-4 p-3"
+          activeLinkClass="bg-[#0cbcbe]  p-3 text-white rounded-full"
+          itemClass="mx-3 rounded-full"
+          innerClass="flex mt-6 "
           totalItemsCount={pagination.totalElements}
           activePage={pagination.pageNumber}
           itemsCountPerPage={pagination.pageSize}

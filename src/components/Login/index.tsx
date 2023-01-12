@@ -68,7 +68,7 @@ const Login = () => {
             placeholder="Senha de acesso"
             icon={<Key size={16} />}
             type="password"
-            className="w-full mb-4 "
+            className="w-full mb-4 border "
             value={login.password}
             onChange={(e: any) => handleInputValue(e, "password")}
           />

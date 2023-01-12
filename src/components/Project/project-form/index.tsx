@@ -44,8 +44,6 @@ const FormProject: React.FC<Props> = ({ initialData }: any) => {
     }, 1000);
   };
 
-  console.log(project);
-
   const getClientSelect = (searchTerm: any = "") => {
     return http.get(`/customer/v2?searchTerm=${searchTerm}`).then((resp) => {
       return resp.data.content;

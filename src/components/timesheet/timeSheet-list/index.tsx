@@ -21,27 +21,25 @@ interface TimesheetProps {
   pageSize: number;
   totalElements: number;
   content: [];
-  pageable?: any;
   employee?: number;
 }
 
 const TimeSheetList: React.FC = () => {
   const router = useRouter();
-  const [showModal, setShowModal] = useState(false);
-  const [deletedItem, setDeletedItem] = useState<any>({});
+  const [showModalDeleted, setShowModalDeleted] = useState(false);
+  const [showModalStatus, setShowModalStatus] = useState(false);
+  const [selectedItem, setSelectedItem] = useState<any>({});
   const [inputValue, setInputValue] = useState("");
   const [messageError, setMessageError] = useState("");
   const [pagination, setPagination] = useState<TimesheetProps>({
     pageNumber: 1,
-    pageSize: 10,
+    pageSize: 4,
     totalElements: 1,
     content: [],
-    pageable: {},
   });
 
-  const getTimeSheets = (pageNumber = 1, pageSize = 10) => {
+  const getTimeSheets = (pageNumber = 1, pageSize = 4) => {
     OrganizationService.getTimeSheet(pageSize, pageNumber).then((response) => {
-      console.log(response);
       setPagination({
         ...pagination,
         pageSize,
@@ -52,9 +50,8 @@ const TimeSheetList: React.FC = () => {
   };
 
   const deleteFromList = async () => {
-    const value = inputValue.toUpperCase();
-    if (value === "CONFIRMAR") {
-      await http.delete(`/timesheet/${deletedItem.id}`);
+    if (inputValue === "Confirmar") {
+      await http.delete(`/timesheet/${selectedItem.id}`);
       toast.success("Item deletado", {
         position: "top-right",
         icon: <IoCheckmarkDoneSharp size={22} className="text-green-900" />,
@@ -67,17 +64,26 @@ const TimeSheetList: React.FC = () => {
         theme: "colored",
       });
       getTimeSheets();
-      setShowModal(false);
+      setShowModalDeleted(false);
     } else {
       setMessageError("Digite 'Confirmar' para deletar item");
     }
+  };
+
+  const handleStatus = async (status: string) => {
+    await http.post(`/timesheet`, {
+      ...selectedItem,
+      status,
+    });
+    setShowModalStatus(false);
+    getTimeSheets();
   };
 
   useEffect(() => {
     getTimeSheets();
   }, []);
 
-  const editFromList = (id: any) => {
+  const editFromList = (id: number) => {
     router.push(`/timesheet/edit/${id}`);
   };
 
@@ -183,18 +189,27 @@ const TimeSheetList: React.FC = () => {
                 )}
                 align="center"
               />
-              {/* <ListColumn
-                name="approved"
+              <ListColumn
+                name="status"
                 label="Status"
                 render={(row) => (
+                  // console.log(row)
                   <div>
-                    <label className="text-gray-900">
-                      {row.approved ? "Aprovado" : "Pendente"}
-                    </label>
+                    <button
+                      className="text-gray-900"
+                      onClick={() => {
+                        setShowModalStatus(
+                          row.status === "Aprovado" ? false : true
+                        );
+                        setSelectedItem(row);
+                      }}
+                    >
+                      {row.status}
+                    </button>
                   </div>
                 )}
                 align="center"
-              /> */}
+              />
               <ListColumn
                 name="edit"
                 label="Editar"
@@ -223,8 +238,8 @@ const TimeSheetList: React.FC = () => {
                         style={{ color: "#ff0000" }}
                         onClick={() => {
                           setMessageError("");
-                          setDeletedItem(row);
-                          setShowModal(true);
+                          setSelectedItem(row);
+                          setShowModalDeleted(true);
                         }}
                       />
                     </button>
@@ -238,7 +253,7 @@ const TimeSheetList: React.FC = () => {
       )}
       <div className="flex items-center  justify-center">
         <Pagination
-          activeLinkClass="bg-[#0cbcbe] p-3  rounded-full"
+          activeLinkClass="bg-[#0cbcbe] p-3 text-white rounded-full"
           itemClass="mx-3"
           innerClass="flex mt-4 p-3"
           totalItemsCount={pagination.totalElements}
@@ -251,12 +266,12 @@ const TimeSheetList: React.FC = () => {
       </div>
       <PureModal
         header="Deletar item"
-        isOpen={showModal}
+        isOpen={showModalDeleted}
         closeButton={
           <VscChromeClose size={20} className="text-gray-700 mt-1" />
         }
         onClose={() => {
-          setShowModal(false);
+          setShowModalDeleted(false);
           setInputValue("");
         }}
       >
@@ -282,6 +297,41 @@ const TimeSheetList: React.FC = () => {
             }}
           >
             Deletar
+          </button>
+        </div>
+      </PureModal>
+
+      <PureModal
+        header="status"
+        isOpen={showModalStatus}
+        closeButton={
+          <VscChromeClose size={20} className="text-gray-700 mt-1" />
+        }
+        onClose={() => {
+          setShowModalStatus(false);
+        }}
+      >
+        <div className="flex flex-col" style={{ maxWidth: 300 }}>
+          <p className="leading-5 mb-5 break-normal text-center">
+            Deseja aprovar essas horas?
+          </p>
+
+          {messageError && <p className="text-red-400 ">{messageError}</p>}
+          <button
+            className="bg-green-500 rounded-full py-3 text-white outline-none mb-4"
+            onClick={() => {
+              handleStatus("Aprovado");
+            }}
+          >
+            Aceitar
+          </button>
+          <button
+            className="bg-red-500 rounded-full py-3 text-white outline-none"
+            onClick={() => {
+              handleStatus("Recusado");
+            }}
+          >
+            Recusar
           </button>
         </div>
       </PureModal>

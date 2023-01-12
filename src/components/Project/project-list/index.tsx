@@ -47,7 +47,6 @@ const ProjectsList: React.FC = () => {
   ) => {
     OrganizationService.getProject(searchTerm, pageSize, pageNumber).then(
       (response) => {
-        console.log(response);
         setPagination({
           ...pagination,
           searchTerm,
@@ -64,8 +63,7 @@ const ProjectsList: React.FC = () => {
   }, []);
 
   const deleteProjectFromList = async () => {
-    const value = inputValue.toUpperCase();
-    if (value === "CONFIRMAR") {
+    if (inputValue === "Confirmar") {
       await http.delete(`/project/${deletedItem.id}`);
       toast.success("Item deletado", {
         position: "top-right",
@@ -103,7 +101,6 @@ const ProjectsList: React.FC = () => {
             <input
               style={{ borderRadius: "14px" }}
               className={`bg-transparent h-14 outline-none flex-1 w-full pl-5 border border-solid border-slate-400`}
-              placeholder="João..."
               onChange={(e: any) => handleInputSearch(e)}
             />
           </div>
@@ -293,7 +290,7 @@ const ProjectsList: React.FC = () => {
       )}
       <div className="flex items-center  justify-center">
         <Pagination
-          activeLinkClass="bg-[#0cbcbe] p-3  rounded-full"
+          activeLinkClass="bg-[#0cbcbe] p-3 text-white rounded-full"
           itemClass="mx-3"
           innerClass="flex mt-4 p-3"
           totalItemsCount={pagination.totalElements}

@@ -10,13 +10,13 @@ import { MdWarning } from "react-icons/md";
 import { OrganizationService } from "../../../services/organizations-service";
 
 interface Props {
-  initialData?: any;
+  initialData?: object;
 }
 
-const CollaboratorForm: React.FC<Props> = ({ initialData }: any) => {
+const CollaboratorForm: React.FC<Props> = ({ initialData }) => {
   const [collaborator, setCollaborator] = useState<any>(initialData || {});
   const router = useRouter();
-  console.log(initialData);
+
   const handleSubmitChange = async () => {
     await toast.promise(
       OrganizationService.CollaboratorForm({ ...collaborator }),
@@ -58,14 +58,13 @@ const CollaboratorForm: React.FC<Props> = ({ initialData }: any) => {
     input.value = phoneMask(input.value);
   };
 
-  const phoneMask = (value: any) => {
+  const phoneMask = (value: string) => {
     value = value.replace(/\D/g, "");
     value = value.replace(/(\d{2})(\d)/, "($1) $2");
     value = value.replace(/(\d)(\d{4})$/, "$1-$2");
     setCollaborator({ ...collaborator, cellphone: value });
     return value;
   };
-  console.log(collaborator);
 
   return (
     <>

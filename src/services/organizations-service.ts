@@ -23,6 +23,10 @@ export namespace OrganizationService {
     return http.get(`/employee/v2?searchTerm=${searchTerm}&pageSize=${pageSize}&pageNumber=${pageNumber - 1}`)
   }
 
+  export async function getCollaboratorById(id: any) {
+    return http.get(`/employee/${id}`)
+  }
+
 
   export async function CollaboratorForm(props: any) {
     return http.post("/employee", props)
@@ -52,5 +56,11 @@ export namespace OrganizationService {
 
   export async function companySubmit(props: any) {
     return http.post("/company", props)
+  }
+
+
+  export async function timelineHandle(id: any,) {
+    return http.get(`/timesheet/v2?employee=${id}`)
+    // http.get(`/timesheet/v2?employee=${selectedItem.id}`)
   }
 }
