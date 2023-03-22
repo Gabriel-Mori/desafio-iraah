@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 import http from "../../../http";
 import { IoCheckmarkDoneSharp } from "react-icons/io5";
 import { MdWarning } from "react-icons/md";
-import { OrganizationService } from "../../../services/organizations-service";
 import Label from "../../Label";
 import Select from "../../Select";
 import KgDatePicker from "../../KgDatePicker";

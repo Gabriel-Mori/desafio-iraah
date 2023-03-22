@@ -39,13 +39,13 @@ const Edit: NextPage = ({ client }: any) => {
 export default Edit;
 
 export const getServerSideProps = async (context: any) => {
-  const client = await http
+  const clientId = await http
     .get(`/customer/${context.params.id}`)
     .then((resp) => resp.data);
 
   return {
     props: {
-      client: client,
+      client: clientId,
     },
   };
 };

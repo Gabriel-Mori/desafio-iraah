@@ -96,16 +96,16 @@ const Select: React.FC<Props> = ({
             ...fetch,
             ...(enableAdd
               ? [
-                  {
-                    new: true,
-                    name:
-                      inputValue.length == 0
+                {
+                  new: true,
+                  name:
+                    inputValue.length == 0
+                      ? defaultLabelCreate
                         ? defaultLabelCreate
-                          ? defaultLabelCreate
-                          : "(Novo)"
-                        : "Criar: " + inputValue,
-                  },
-                ]
+                        : "(Novo)"
+                      : "Criar: " + inputValue,
+                },
+              ]
               : []),
           ].filter((op) => {
             if (fieldLabel) {
@@ -123,15 +123,15 @@ const Select: React.FC<Props> = ({
           ...arr,
           ...(enableAdd
             ? [
-                {
-                  name:
-                    inputValue.length == 0
+              {
+                name:
+                  inputValue.length == 0
+                    ? defaultLabelCreate
                       ? defaultLabelCreate
-                        ? defaultLabelCreate
-                        : "(Novo)"
-                      : "Criar: " + inputValue,
-                },
-              ]
+                      : "(Novo)"
+                    : "Criar: " + inputValue,
+              },
+            ]
             : []),
         ]);
       }
@@ -208,14 +208,14 @@ const Select: React.FC<Props> = ({
           control: (provided: any, state: any) => {
             return {
               ...provided,
-              boxShadow:
-                " 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
+              // boxShadow:
+              //   " 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
               background: "transparent",
               border: controlStyles
                 ? "transparent"
                 : state.isFocused
-                ? "1px solid #e91756"
-                : "1px solid #9ca3af",
+                  ? "1px solid #e91756"
+                  : "1px solid #9ca3af",
               "&:hover": {
                 borderColor: state.isFocused ? "#e91756" : "#9ca3af",
               },
@@ -235,13 +235,13 @@ const Select: React.FC<Props> = ({
               background: state.isFocused
                 ? "#6fd0c4"
                 : theme === "dark"
-                ? "gray"
-                : "white",
+                  ? "gray"
+                  : "white",
               color: state.isFocused
                 ? "black"
                 : theme === "dark"
-                ? "white"
-                : "black",
+                  ? "white"
+                  : "black",
               cursor: "pointer",
             };
           },
@@ -252,7 +252,7 @@ const Select: React.FC<Props> = ({
             };
           },
         }}
-        className="border border-solid border-gray-400 rounded-lg text-sm bg-transparent  font-primary  dark:text-white"
+        className="rounded-lg text-sm bg-transparent  font-primary  dark:text-white"
         placeholder={placeholder || ""}
       />
     </div>

@@ -1,19 +1,34 @@
 import React, { useEffect, useState } from "react";
-import List from "../../List";
-import ListColumn from "../../List/ListColumn";
-import { FiEdit } from "react-icons/fi";
-import { HiPlus, HiTrash } from "react-icons/hi2";
 import { useRouter } from "next/router";
 import http from "../../../http";
-import { OrganizationService } from "../../../services/organizations-service";
 import Pagination from "react-js-pagination";
 import { VscChromeClose } from "react-icons/vsc";
 import PureModal from "react-pure-modal";
 import "react-pure-modal/dist/react-pure-modal.min.css";
 import Input from "../../input";
 import { toast } from "react-toastify";
-import { IoCheckmarkDoneSharp } from "react-icons/io5";
-import { MdWarning } from "react-icons/md";
+import { IoCheckmarkDoneSharp, IoSearchOutline } from "react-icons/io5";
+import { CustomerService } from "../../../services/customer-service";
+import Button from "../../Button";
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
+import Row from "../Row";
+
+interface Props {
+  name?: string;
+  id?: number;
+  email?: string;
+  phone?: string;
+  active?: boolean;
+  projects?: any;
+}
+
 
 interface PaginationProps {
   pageNumber: number;
@@ -24,12 +39,13 @@ interface PaginationProps {
   searchTerm?: string;
 }
 
-const ClientList: React.FC = () => {
+const ClientList: React.FC<Props> = () => {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [deletedItem, setDeletedItem] = useState<any>({});
   const [inputValue, setInputValue] = useState("");
   const [messageError, setMessageError] = useState("");
+  const [rows, setRows] = useState<Props[]>([])
   const [pagination, setPagination] = useState<PaginationProps>({
     pageNumber: 1,
     pageSize: 10,
@@ -44,7 +60,7 @@ const ClientList: React.FC = () => {
     pageNumber = 1,
     pageSize = 10
   ) => {
-    OrganizationService.getClient(searchTerm, pageSize, pageNumber).then(
+    CustomerService.getCustomer(searchTerm, pageSize, pageNumber).then(
       (response) => {
         setPagination({
           ...pagination,
@@ -57,22 +73,31 @@ const ClientList: React.FC = () => {
     );
   };
 
+  function createData(row: any) {
+    return {
+      name: row.name,
+      email: row.email,
+      phone: row.phone,
+      projects: row.projects,
+      active: row.active,
+      id: row.id
+    }
+  }
+
+
   const handleInputSearch = (e: any) => {
     const { value } = e.target;
     searchClients(value);
   };
 
   const deleteClientFromList = async () => {
+    console.log('chamo')
     if (inputValue === "Confirmar") {
       await http.delete(`/customer/${deletedItem.id}`);
       toast.success("Item deletado", {
         position: "top-right",
         icon: <IoCheckmarkDoneSharp size={22} className="text-green-900" />,
         autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
         progress: undefined,
         theme: "colored",
       });
@@ -87,122 +112,63 @@ const ClientList: React.FC = () => {
     searchClients();
   }, []);
 
+  useEffect(() => {
+    const newRows: any = pagination.content.map((rows) => createData(rows))
+    setRows(newRows)
+  }, [pagination]);
+
   const edit = (id: any) => {
     router.push(`/clients/edit/${id}`);
   };
 
+
   return (
     <div>
       <div className="mt-8">
-        <div className="flex justify-between items-center mb-6">
-          <div className="w-full">
-            <h2 className="mb-2">Pesquise por nome do cliente</h2>
-            <input
-              style={{ borderRadius: "14px" }}
-              className={`bg-transparent h-14 outline-none flex-1 w-full pl-5 border border-solid border-slate-400`}
+        <div className="flex justify-between items-end mb-6">
+          <div className="w-full mr-5">
+            <Input
+              className="border border-gray-300 "
+              placeholder="Pesquise por nome do cliente"
+              icon={<IoSearchOutline className="font-gray-medium" />}
               onChange={(e: any) => handleInputSearch(e)}
             />
           </div>
-          <button
-            className={` text-white dark:text-white text-1xl rounded-full px-6 py-2 w-60 h-14 ml-5 mt-8 hover:bg-orange-500 bg-orange-400`}
+          <Button
+            className="hover:opacity-80 duration-200"
+            label="+ Cadastrar novo"
             onClick={() => {
               router.push("/clients/form");
             }}
-          >
-            <div className="flex items-center ">
-              <HiPlus size={22} />
-              <h3 className="ml-3 text-1xl"> Cadastrar novo</h3>
-            </div>
-          </button>
+          />
         </div>
+        <div className=" bg-slate-100 mt-4"></div>
       </div>
 
-      {pagination.content && (
-        <div className="shadow-2xl border bg-slate-100 rounded ">
-          <div className="p-2 ">
-            <List
-              data={pagination.content ? pagination.content : []}
-              minWidth={1000}
-            >
-              <ListColumn
-                name="name"
-                label="Nome"
-                render={(row) => (
-                  <div>
-                    <label className="text-gray-900">
-                      {row.name ? row.name : "----"}
-                    </label>
-                  </div>
-                )}
-                align="center"
+      <TableContainer component={Paper}>
+        <Table aria-label="collapsible table">
+          <TableHead>
+            <TableRow>
+              <TableCell />
+              <TableCell>Nome</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Telefone</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Editar</TableCell>
+              <TableCell>Deletar</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map((row) => (
+              <Row key={row.id} row={row}
+                setDeletedItem={setDeletedItem}
+                setMessageError={setMessageError}
               />
-              <ListColumn
-                name="company"
-                label="Empresa"
-                render={(row) => (
-                  <div>
-                    <label className="text-gray-900">
-                      {row.company?.companyName
-                        ? row.company.companyName
-                        : "----"}
-                    </label>
-                  </div>
-                )}
-                align="center"
-              />
-              <ListColumn
-                name="email"
-                label="Email"
-                render={(row) => (
-                  <div>
-                    <label className="text-gray-900">
-                      {row.email ? row.email : "----"}
-                    </label>
-                  </div>
-                )}
-                align="center"
-              />
-              <ListColumn
-                name="edit"
-                label="Editar"
-                render={(row) => (
-                  <div className="flex  justify-end  text-gray-500 ">
-                    <label className="cursor-pointer mr-1">
-                      <FiEdit
-                        size={22}
-                        onClick={() => {
-                          edit(row.id);
-                        }}
-                      />
-                    </label>
-                  </div>
-                )}
-                align="right"
-              />
-              <ListColumn
-                name="delete"
-                label="Deletar"
-                render={(row) => (
-                  <div className="flex  justify-end  text-gray-500 ">
-                    <button className="cursor-pointer mr-2">
-                      <HiTrash
-                        size={22}
-                        style={{ color: "#ff0000" }}
-                        onClick={() => {
-                          setMessageError("");
-                          setDeletedItem(row);
-                          setShowModal(true);
-                        }}
-                      />
-                    </button>
-                  </div>
-                )}
-                align="right"
-              />
-            </List>
-          </div>
-        </div>
-      )}
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
       <div className="flex items-center  justify-center">
         <Pagination
           activeLinkClass="bg-[#0cbcbe] p-3 text-white rounded-full"
@@ -223,12 +189,12 @@ const ClientList: React.FC = () => {
 
       <PureModal
         header="Deletar item"
-        isOpen={showModal}
+        isOpen={!!deletedItem.id}
         closeButton={
           <VscChromeClose size={20} className="text-gray-700 mt-1" />
         }
         onClose={() => {
-          setShowModal(false);
+          setDeletedItem({});
           setInputValue("");
         }}
       >

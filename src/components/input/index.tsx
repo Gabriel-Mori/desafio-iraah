@@ -40,13 +40,11 @@ const Input: React.FC<Props> = ({
     <div className="flex flex-col">
       {label && <Label label={label} />}
       <div
-        className={`${
-          theme == "dark"
-            ? "bg-gray-ultra-dark dark:border-none text-gray-ultra-light"
-            : "bg-chat"
-        } dark:bg-gray-ultra-dark flex flex-row items-center ${
-          icon ? "px-4" : "px-2"
-        } py-4 w-full rounded-lg ${className}`}
+        className={`${theme == "dark"
+          ? "bg-gray-ultra-dark dark:border-none text-gray-ultra-light"
+          : "bg-chat"
+          } dark:bg-gray-ultra-dark flex flex-row items-center ${icon ? "px-4" : "px-2"
+          } py-4 w-full rounded-lg ${className}`}
       >
         {icon}
         <input
@@ -61,9 +59,8 @@ const Input: React.FC<Props> = ({
           {...(onChange ? { onChange } : {})}
           {...(onFocus ? { onFocus } : {})}
           {...(onKeyUp ? { onKeyUp } : {})}
-          className={`bg-transparent h-full outline-none flex-1 w-full pl-2 ${
-            inputType == "number" ? "text-right" : "text-left"
-          }`}
+          className={`bg-transparent h-full outline-none flex-1 w-full pl-2 ${inputType == "number" ? "text-right" : "text-left"
+            }`}
         />
         {type === "password" && inputType == "password" && (
           <FiEye

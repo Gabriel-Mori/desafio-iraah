@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 import http from "../../../http";
 import { IoCheckmarkDoneSharp } from "react-icons/io5";
 import { MdWarning } from "react-icons/md";
-import { OrganizationService } from "../../../services/organizations-service";
 
 interface Props {
   initialData?: object;
@@ -109,11 +108,10 @@ const CollaboratorForm: React.FC<Props> = ({ initialData }) => {
       <div className="flex justify-center mt-16">
         <button
           disabled={!collaborator.name}
-          className={`w-96  ${
-            collaborator.name
+          className={`w-96  ${collaborator.name
               ? " bg-[#0cbcbe] hover:bg-[#53aeb0]"
               : "bg-[#507879]"
-          } outline-none transition ease-in-out delay-100 text-white font-bold py-4 border-none rounded-full`}
+            } outline-none transition ease-in-out delay-100 text-white font-bold py-4 border-none rounded-full`}
           type="button"
           onClick={handleSubmitChange}
         >

@@ -5,7 +5,6 @@ import { FiEdit } from "react-icons/fi";
 import { HiPlus, HiTrash } from "react-icons/hi2";
 import { useRouter } from "next/router";
 import http from "../../../http";
-import { OrganizationService } from "../../../services/organizations-service";
 import Pagination from "react-js-pagination";
 import PureModal from "react-pure-modal";
 import "react-pure-modal/dist/react-pure-modal.min.css";
@@ -62,7 +61,7 @@ const CompanyList: React.FC = () => {
   };
 
   const deleteCompany = async () => {
-    // try {
+
     if (inputValue === "Confirmar") {
       await http.delete(`/company/${deletedItem.id}`);
       toast.success("Item deletado", {
@@ -81,11 +80,7 @@ const CompanyList: React.FC = () => {
     } else {
       setMessageError("Digite 'Confirmar' para deletar item");
     }
-    // } catch (error) {
-    //   console.log(error);
-    //   const { data } = error.response;
-    //   alert(data.message);
-    // }
+
   };
 
   useEffect(() => {
@@ -173,9 +168,9 @@ const CompanyList: React.FC = () => {
                     <label className="text-gray-900">
                       {row.cnpj
                         ? row.cnpj.replace(
-                            /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
-                            "$1.$2.$3/$4-$5"
-                          )
+                          /^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
+                          "$1.$2.$3/$4-$5"
+                        )
                         : "----"}
                     </label>
                   </div>

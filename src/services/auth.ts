@@ -1,6 +1,5 @@
-
-import axios from "axios";
-import { constants } from "../constants";
+import axios from 'axios'
+import { constants } from '../constants'
 
 export namespace AuthService {
   export async function login(user: string, password: string) {
@@ -9,22 +8,29 @@ export namespace AuthService {
         user,
         password,
       })
-      .then((response) => {
-        const data = response.data;
+      .then((response: any) => {
+        const data = response.data
 
         return {
-          name: data.name,
+          id: data.id,
+          username: data.username,
+          phone: data.phone,
           picture: data.picture,
           token: data.token,
-        };
-      });
+          employee: {
+            ...data.employee,
+          },
+        }
+      })
   }
 
   export async function me(token: string) {
-    return axios.get(`${constants.baseAPI}/public/token/get/${token}`);
+    return axios.get(`${constants.baseAPI}/public/token/get/${token}`)
   }
 
   export async function companies(token: string) {
-    return axios.get(`${constants.baseAPI}/api/public/token/organizations/${token}`);
+    return axios.get(
+      `${constants.baseAPI}/api/public/token/organizations/${token}`,
+    )
   }
 }

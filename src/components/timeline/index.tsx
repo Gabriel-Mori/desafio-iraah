@@ -42,7 +42,7 @@ const TimelinePage: React.FC<TimelineProps> = ({ id }) => {
     });
   };
 
-  console.log(elements);
+
 
   useEffect(() => {
     getHistoryCollaborator();

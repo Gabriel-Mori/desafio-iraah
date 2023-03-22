@@ -1,17 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Input from "../../input";
-import Select from "../../Select";
 import Label from "../../Label";
 import { useRouter } from "next/router";
-import http from "../../../http";
-import moment from "moment";
 import "react-datepicker/dist/react-datepicker.css";
-import KgDatePicker from "../../KgDatePicker";
 import { toast } from "react-toastify";
 import { IoCheckmarkDoneSharp } from "react-icons/io5";
 import { MdWarning } from "react-icons/md";
-import { background } from "@chakra-ui/react";
-import { OrganizationService } from "../../../services/organizations-service";
+import Panel from "../../Panel";
+import Button from "../../Button";
+import DatePick from "../../Date";
+import { ProjectService } from "../../../services/project-service";
+
 
 interface Props {
   initialData?: any;
@@ -22,43 +21,36 @@ const FormProject: React.FC<Props> = ({ initialData }: any) => {
   const router = useRouter();
 
   const submitForm = async () => {
-    await toast.promise(OrganizationService.formProjectSubmit({ ...project }), {
-      pending: "Verificando dados",
-      success: {
-        render() {
-          return "Salvo com sucesso";
+    await toast.promise(
+      ProjectService.saveProject({
+        ...project,
+        active: project?.id ? project.active : true,
+      }),
+      {
+        pending: "Verificando dados",
+
+        success: {
+          render() {
+            return "Salvo com sucesso";
+          },
+          icon: (
+            <IoCheckmarkDoneSharp size={22} className="text-green-900 ml" />
+          ),
+          theme: "colored",
         },
-        icon: <IoCheckmarkDoneSharp size={22} className="text-green-900 ml" />,
-        theme: "colored",
-      },
-      error: {
-        render() {
-          return "Falha ao Salvar";
+
+        error: {
+          render() {
+            return "Falha ao Salvar";
+          },
+          icon: <MdWarning size={22} className="text-yellow-200" />,
+          theme: "colored",
         },
-        icon: <MdWarning size={22} className="text-yellow-200" />,
-        theme: "colored",
-      },
-    });
+      }
+    );
     setTimeout(() => {
       router.push("/projects/list");
     }, 1000);
-  };
-
-  const getClientSelect = (searchTerm: any = "") => {
-    return http.get(`/customer/v2?searchTerm=${searchTerm}`).then((resp) => {
-      return resp.data.content;
-    });
-  };
-
-  const getEmployee = (searchTerm: any = "") => {
-    return http.get(`/employee/v2?searchTerm=${searchTerm}`).then((resp) => {
-      return resp.data.content;
-    });
-  };
-  const getSupervisor = () => {
-    return http.get(`/employee/supervisor`).then((resp) => {
-      return resp.data;
-    });
   };
 
   const handleInputValue = (e: any, name: string) => {
@@ -73,99 +65,83 @@ const FormProject: React.FC<Props> = ({ initialData }: any) => {
 
   return (
     <>
-      <form>
-        <Input
-          label="Projeto"
-          value={project.projectName}
-          className={`border border-slate-400  mb-5 shadow-xl`}
-          placeholder="Tflow"
-          onChange={(e: any) => handleInputValue(e, "projectName")}
-        />
-
-        <div className="w-full mr-4 ">
-          <Label label="Cliente" />
-          <Select
-            placeholder="Selecione o Cliente"
-            onChange={(_, value) => {
-              setProject({ ...project, customer: value });
-            }}
-            fetch={getClientSelect}
-            value={project.customer}
-            fieldLabel="name"
-          />
-        </div>
-
-        <div className="w-full mr-4  mt-4">
-          <Label label="Colaborador" />
-          <Select
-            isClearable={false}
-            placeholder="Selecione o Colaborador"
-            onChange={(_, value) => {
-              setProject({ ...project, employees: value });
-            }}
-            fetch={getEmployee}
-            value={project.employees}
-            fieldLabel="name"
-            isMulti={true}
-          />
-        </div>
-        <div className="w-full mr-4  mt-4">
-          <Label label="Supervisor" />
-          <Select
-            placeholder="Selecione o Supervisor"
-            onChange={(_, value) => {
-              setProject({ ...project, supervisor: value });
-            }}
-            fetch={getSupervisor}
-            value={project.supervisor}
-            fieldLabel="name"
-            isMulti={true}
-          />
-        </div>
-
-        <div className="flex flex-col mt-5">
-          <Label label="Datas" />
-        </div>
-        <div className="flex justify-start mb-3 ">
-          <div className=" flex items-center">
-            <label className="mr-2 dark:text-white text-4xl sm:text-base font-semibold text-font-color-light-gray">
-              De:
-            </label>
-            <KgDatePicker
-              onChange={(e: any, value: any) => {
-                setProject({ ...project, startDate: value });
-              }}
-              value={project.startDate}
-            />
+      <Panel>
+        <form className="w-full">
+          <div className="flex">
+            <div className="flex-1 mr-5  ">
+              <Input
+                className="border border-gray-400"
+                label="Projeto"
+                value={project.projectName}
+                placeholder="Informe o nome do projeto"
+                onChange={(e: any) => handleInputValue(e, "projectName")}
+              />
+            </div>
           </div>
 
-          <div className=" flex items-center">
-            <label className="mr-2  ml-5 dark:text-white text-4xl sm:text-base font-semibold text-font-color-light-gray">
-              Até:
-            </label>
-            <KgDatePicker
-              disabled={!project.startDate}
-              onChange={(e: any, value: any) => {
-                setProject({ ...project, endDate: value });
-              }}
-              value={project.endDate}
-            />
+          <div className="flex flex-col mt-5">
+            <Label label="Datas" />
           </div>
-        </div>
-      </form>
+          <div className="flex justify-start mb-3 ">
+            <div className=" flex items-center">
+              <Label label="De:" />
+
+              <div className="ml-5">
+                <DatePick
+                  onChange={(e: any, value: any) => {
+                    setProject({ ...project, startDate: value });
+                  }}
+                  value={project.startDate}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center ml-5">
+              <Label label=" Até:" />
+
+              <div className="ml-5">
+                <DatePick
+                  disabled={!project.startDate}
+                  onChange={(e: any, value: any) => {
+                    setProject({ ...project, endDate: value });
+                  }}
+                  value={project.endDate}
+                />
+              </div>
+            </div>
+          </div>
+          {project?.id && (
+            <div className="flex items-center mt-5">
+              <input
+                id="status"
+                className={` w-5 h-5 text-seconda bg-gray-100 border-gray-300 
+                            rounded-full focus:ring-secondary dark:focus:ring-secondary cursor-pointer`}
+                checked={project.active}
+                type="checkbox"
+                onChange={(e: any) =>
+                  setProject({
+                    ...project,
+                    active: e.target.checked,
+                  })
+                }
+              />
+              <label
+                htmlFor="status"
+                className="ml-2 text-gray-900 cursor-pointer"
+              >
+                Ativo
+              </label>
+            </div>
+          )}
+        </form>
+      </Panel>
       <div className="flex justify-center mt-16">
-        <button
-          disabled={!project.projectName}
-          className={`w-96  ${
-            project.projectName
-              ? " bg-[#0cbcbe] hover:bg-[#53aeb0]"
-              : "bg-[#507879]"
-          } outline-none transition ease-in-out delay-100 text-white font-bold py-4 border-none rounded-full`}
-          type="button"
+        <Button
           onClick={submitForm}
-        >
-          Salvar
-        </button>
+          label="Salvar"
+          disabled={false}
+          cancel={() => router.push("/projects/list")}
+        />
       </div>
     </>
   );

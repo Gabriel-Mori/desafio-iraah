@@ -5,7 +5,6 @@ import { FiEdit } from "react-icons/fi";
 import { HiPlus, HiTrash } from "react-icons/hi2";
 import { useRouter } from "next/router";
 import http from "../../../http";
-import { OrganizationService } from "../../../services/organizations-service";
 import { Tooltip, dividerClasses } from "@mui/material";
 import moment from "moment";
 import Pagination from "react-js-pagination";
@@ -193,7 +192,6 @@ const TimeSheetList: React.FC = () => {
                 name="status"
                 label="Status"
                 render={(row) => (
-                  // console.log(row)
                   <div>
                     <button
                       className="text-gray-900"
